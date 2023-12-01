@@ -1,9 +1,7 @@
 import * as React from 'react';
-import Box from '@mui/joy/Box';
 import Sheet from '@mui/joy/Sheet';
 import List from '@mui/joy/List';
 import ListItemButton from '@mui/joy/ListItemButton';
-import ModalClose from '@mui/joy/ModalClose';
 
 export default function Sidebar() {
   return (
