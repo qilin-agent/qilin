@@ -1,3 +1,4 @@
 flask[async]==2.2.2
 gunicorn
 Werkzeug==2.3.7
+azure-storage-blob
