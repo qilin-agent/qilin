@@ -2,3 +2,6 @@ flask[async]==2.2.2
 gunicorn
 Werkzeug==2.3.7
 azure-storage-blob
+azure-identity
+openai==1.3.7
+pydantic==2.5.2
