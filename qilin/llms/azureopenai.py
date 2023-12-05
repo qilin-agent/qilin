@@ -1,5 +1,6 @@
 import dataclasses
 from qilin.llms.llmabc import LLMChatCompletion, ChatReply, FunctionDefinition
+from typing import AsyncIterable
 
 
 def get_openai_function_definition(function: FunctionDefinition):
@@ -47,14 +48,14 @@ class AzureOpenAIChatCompletion(LLMChatCompletion):
     """
     def __init__(self, azure_endpoint, model, api_version, api_key):
         self.model = model
-        from openai import AzureOpenAI
-        self.client = AzureOpenAI(
+        from openai import AsyncAzureOpenAI
+        self.client = AsyncAzureOpenAI(
             azure_endpoint=azure_endpoint,
             api_version=api_version,
             api_key=api_key
         )
 
-    def complete(self,
+    async def complete(self,
             messages,
             functions=None,
             temperature=0,
@@ -62,7 +63,7 @@ class AzureOpenAIChatCompletion(LLMChatCompletion):
             frequency_penalty=0,
             presence_penalty=0,
             stream=False
-        ):
+        ) -> AsyncIterable[ChatReply]:
         params = {
             "model": self.model,
             "messages": [dataclasses.asdict(message) for message in messages],
@@ -75,9 +76,11 @@ class AzureOpenAIChatCompletion(LLMChatCompletion):
         if functions is not None and len(functions) > 0:
             params['functions'] = [get_openai_function_definition(function) for function in functions]
             params['function_call'] = 'auto'
-        completion = self.client.chat.completions.create(**params)
+        completion = await self.client.chat.completions.create(**params)
         if stream:
-            for chunk in completion:
+            async for chunk in completion:
+                if chunk.choices is None or len(chunk.choices) == 0:
+                    continue
                 yield get_openai_reply(chunk.choices, is_delta=True)
                 if chunk.choices[0].finish_reason is not None:
                     break

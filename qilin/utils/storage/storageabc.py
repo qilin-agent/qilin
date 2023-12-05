@@ -1,4 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import AsyncIterable
+from qilin.utils.jsondata import json_loads, json_dumps
+from typing import TypeVar
+
+
+T = TypeVar('T')
 
 
 class Storage(ABC):
@@ -6,23 +12,47 @@ class Storage(ABC):
     Abstract class for storage
     """
     @abstractmethod
-    def save_bytes(self, path: str, data: bytes, overwrite: bool=True) -> bool:
+    async def save_bytes(self, path: str, data: bytes, overwrite: bool=True) -> bool:
         pass
-
-    def save_string(self, path: str, data: str, overwrite: bool=True, encoding: str='utf-8') -> bool:
-        return self.save_bytes(path, data.encode(encoding), overwrite)
 
     @abstractmethod
-    def read_all_bytes(self, path: str) -> bytes:
+    async def read_all_bytes(self, path: str) -> bytes:
         pass
-
-    def read_all_string(self, path: str, encoding: str='utf-8') -> str:
-        return self.read_all_bytes(path).decode(encoding)
     
     @abstractmethod
-    def file_exists(self, path: str) -> bool:
+    async def file_exists(self, path: str) -> bool:
+        pass
+    
+    @abstractmethod
+    async def delete_file(self, path: str) -> bool:
+        pass
+
+    async def save_str(self, path: str, data: str, overwrite: bool=True, encoding: str='utf-8') -> bool:
+        return await self.save_bytes(path, data.encode(encoding), overwrite=overwrite)
+    
+    async def read_all_str(self, path: str, encoding: str='utf-8') -> str:
+        return (await self.read_all_bytes(path)).decode(encoding)
+    
+    async def read_json(self, path: str, obj_type: type[T], encoding: str='utf-8') -> T:
+        json_str = await self.read_all_str(path, encoding=encoding)
+        return json_loads(obj_type, json_str)
+    
+    async def save_json(self, path: str, data: T, overwrite: bool=True, encoding: str='utf-8') -> bool:
+        json_str = json_dumps(data)
+        return await self.save_str(path, json_str, overwrite=overwrite, encoding=encoding)
+    
+    @abstractmethod
+    async def get_row(self, partition_key: str, row_key: str) -> dict:
+        pass
+    
+    @abstractmethod
+    async def query_rows(self, partition_key: str, row_start: str=None, row_end: str=None, top: int=None) -> AsyncIterable[dict]:
         pass
 
     @abstractmethod
-    def delete(self, path: str) -> bool:
+    async def upsert_row(self, entity: dict) -> None:
+        pass
+
+    @abstractmethod
+    async def delete_row(self, entity: dict) -> None:
         pass

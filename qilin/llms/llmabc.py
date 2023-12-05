@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Iterable
+from typing import List, AsyncIterable
 
 
 @dataclass
@@ -50,13 +50,13 @@ class LLMChatCompletion(ABC):
     Abstract class for chat completion
     """
     @abstractmethod
-    def complete(self,
-        messages: List[ChatMessage],
-        functions: List[FunctionDefinition]=None,
-        temperature=0,
-        max_tokens=400,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stream=False) -> Iterable[ChatMessage]:
+    async def complete(self,
+            messages,
+            functions=None,
+            temperature=0,
+            max_tokens=400,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stream=False
+        ) -> AsyncIterable[ChatReply]:
         pass
-

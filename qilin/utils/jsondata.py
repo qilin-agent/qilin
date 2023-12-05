@@ -9,5 +9,5 @@ def json_dumps(data) -> str:
 
 
 T = TypeVar('T')
-def json_loads(type: type[T], json_str: str) -> T:
-    return TypeAdapter(type).validate_json(json_str)
+def json_loads(obj_type: type[T], json_str: str) -> T:
+    return TypeAdapter(obj_type).validate_json(json_str)
