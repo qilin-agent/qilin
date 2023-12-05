@@ -11,7 +11,7 @@ STATIC_URL_PATH = '/static'
 def create_webapp():
     app = FastAPI()
     
-    app.include_router(create_bots_router())
+    app.include_router(create_bots_router(), prefix='/api')
 
     app.mount(STATIC_URL_PATH, StaticFiles(directory=STATIC_FOLDER, html=True), name="static")
 
