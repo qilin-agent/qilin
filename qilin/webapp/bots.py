@@ -16,7 +16,7 @@ class Bot(BaseModel):
 def create_bots_router():
     rt = APIRouter(prefix='/api')
 
-    @rt.get('/bots/{bot_id}')
+    @rt.route('/bots/{bot_id}', methods=['GET'])
     async def get_bot(bot_id):
         file_path = f'bots/{bot_id}/bot.json'
         from qilin.webapp.appconfig import storage
@@ -25,7 +25,7 @@ def create_bots_router():
         return JSONResponse(bot.model_dump())
     
     
-    @rt.post('/bots/{bot_id}')
+    @rt.route('/bots/{bot_id}', methods=['PUT', 'POST'])
     async def update_bot(bot_id: str, bot: Bot):
         bot.api_key = encrypt_string(bot.api_key)
         file_path = f'bots/{bot_id}/bot.json'
