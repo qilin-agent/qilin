@@ -1,18 +1,22 @@
-from flask import Flask
-from qilin.webapp.bots import create_bots_blueprint
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from qilin.webapp.bots import create_bots_router
 
-STATIC_FOLDER = '../../qilin-fe/build/'
-STATIC_URL_PATH = ''
+
+STATIC_FOLDER = './qilin-fe/build/'
+STATIC_URL_PATH = '/'
 
 
 def create_webapp():
-    app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path=STATIC_URL_PATH)
+    app = FastAPI()
+    app.mount(STATIC_URL_PATH, StaticFiles(directory=STATIC_FOLDER), name="static")
 
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def index(path):
-        return app.send_static_file("index.html")
+    @app.get("/")
+    @app.get("/{resource}")
+    async def index(request: Request):
+        return RedirectResponse(url='/index.html')
     
-    app.register_blueprint(create_bots_blueprint(), url_prefix='/api')
-
+    app.include_router(create_bots_router())
+        
     return app

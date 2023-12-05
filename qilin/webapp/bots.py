@@ -1,12 +1,10 @@
-from flask import Blueprint, jsonify, request, Response
-from qilin.webapp.appconfig import storage
-from qilin.utils.jsondata import json_loads
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse, Response
 from qilin.utils.crypto import encrypt_string
-from dataclasses import dataclass, asdict
+from pydantic import BaseModel
 
 
-@dataclass
-class Bot:
+class Bot(BaseModel):
     name: str
     bot_type: str
     endpoint: str
@@ -15,25 +13,25 @@ class Bot:
     api_key: str
 
 
-def create_bots_blueprint():
-    bp = Blueprint('bots', __name__)
+def create_bots_router():
+    rt = APIRouter(prefix='/api')
 
-    @bp.route('/bots/<bot_id>', methods=['GET'])
+    @rt.get('/bots/<bot_id>')
     async def get_bot(bot_id):
         file_path = f'bots/{bot_id}/bot.json'
+        from qilin.webapp.appconfig import storage
         bot = await storage.read_json(file_path, Bot)
         bot.api_key = None
-        return jsonify(asdict(bot))
+        return JSONResponse(bot.model_dump())
     
     
-    @bp.route('/bots/<bot_id>', methods=['POST'])
-    async def update_bot(bot_id):
-        json_str = request.get_data(as_text=True)
-        bot = json_loads(Bot, json_str)
+    @rt.post('/bots/<bot_id>')
+    async def update_bot(bot_id: str, bot: Bot):
         bot.api_key = encrypt_string(bot.api_key)
         file_path = f'bots/{bot_id}/bot.json'
+        from qilin.webapp.appconfig import storage
         await storage.save_json(file_path, bot)
         return Response(status=200)
 
 
-    return bp
+    return rt

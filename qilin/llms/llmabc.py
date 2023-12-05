@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import List, AsyncIterable
+from pydantic import BaseModel
 
 
-@dataclass
-class ChatMessage:
+class ChatMessage(BaseModel):
     """
     Dataclass for chat message
     """
@@ -12,8 +11,7 @@ class ChatMessage:
     content: str
 
 
-@dataclass
-class FunctionParameterDefinition:
+class FunctionParameterDefinition(BaseModel):
     """
     Dataclass for function parameter definition
     """
@@ -23,8 +21,7 @@ class FunctionParameterDefinition:
     required: bool
 
 
-@dataclass
-class FunctionDefinition:
+class FunctionDefinition(BaseModel):
     """
     Dataclass for function definition
     """
@@ -33,8 +30,7 @@ class FunctionDefinition:
     parameters: List[FunctionParameterDefinition]
 
 
-@dataclass
-class ChatReply:
+class ChatReply(BaseModel):
     """
     Dataclass for chat reply
     """
@@ -51,8 +47,8 @@ class LLMChatCompletion(ABC):
     """
     @abstractmethod
     async def complete(self,
-            messages,
-            functions=None,
+            messages: List[ChatMessage],
+            functions: List[FunctionDefinition]=None,
             temperature=0,
             max_tokens=400,
             frequency_penalty=0,

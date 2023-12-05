@@ -1,6 +1,5 @@
-import dataclasses
-from qilin.llms.llmabc import LLMChatCompletion, ChatReply, FunctionDefinition
-from typing import AsyncIterable
+from qilin.llms.llmabc import LLMChatCompletion, ChatReply, FunctionDefinition, ChatMessage
+from typing import AsyncIterable, List
 
 
 def get_openai_function_definition(function: FunctionDefinition):
@@ -56,8 +55,8 @@ class AzureOpenAIChatCompletion(LLMChatCompletion):
         )
 
     async def complete(self,
-            messages,
-            functions=None,
+            messages: List[ChatMessage],
+            functions: List[FunctionDefinition]=None,
             temperature=0,
             max_tokens=400,
             frequency_penalty=0,
@@ -66,7 +65,7 @@ class AzureOpenAIChatCompletion(LLMChatCompletion):
         ) -> AsyncIterable[ChatReply]:
         params = {
             "model": self.model,
-            "messages": [dataclasses.asdict(message) for message in messages],
+            "messages": [message.model_dump() for message in messages],
             "temperature": temperature,
             "max_tokens": max_tokens,
             "frequency_penalty": frequency_penalty,

@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import AsyncIterable
-from qilin.utils.jsondata import json_loads, json_dumps
 from typing import TypeVar
+from pydantic import BaseModel
 
 
-T = TypeVar('T')
+T = TypeVar('T', bound=BaseModel)
 
 
 class Storage(ABC):
@@ -35,10 +35,10 @@ class Storage(ABC):
     
     async def read_json(self, path: str, obj_type: type[T], encoding: str='utf-8') -> T:
         json_str = await self.read_all_str(path, encoding=encoding)
-        return json_loads(obj_type, json_str)
+        return obj_type.model_validate_json(json_str)
     
     async def save_json(self, path: str, data: T, overwrite: bool=True, encoding: str='utf-8') -> bool:
-        json_str = json_dumps(data)
+        json_str = data.model_dump_json()
         return await self.save_str(path, json_str, overwrite=overwrite, encoding=encoding)
     
     @abstractmethod
