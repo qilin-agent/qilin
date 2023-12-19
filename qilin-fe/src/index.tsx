@@ -4,15 +4,13 @@ import reportWebVitals from './reportWebVitals';
 import '@fontsource/inter';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { StyledEngineProvider, CssVarsProvider } from '@mui/joy/styles';
+import { StyledEngineProvider } from '@mui/material/styles';
 
 
 ReactDOM.createRoot(document.querySelector("#root")!).render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
-      <CssVarsProvider>
-        <App />
-      </CssVarsProvider>
+      <App />
     </StyledEngineProvider>
   </React.StrictMode>
 );

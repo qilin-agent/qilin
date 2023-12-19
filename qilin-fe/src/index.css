@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#error-page {
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  height: 100%;
+}

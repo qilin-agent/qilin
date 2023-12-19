@@ -1,31 +1,28 @@
 import './App.css';
 import * as React from 'react';
-import Grid from '@mui/joy/Grid';
-import MessagesPane from './components/MessagesPane';
-import Sidebar from './components/Sidebar';
-import { ChatProps } from './shared/types';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Root } from './layout/Root';
+import { ErrorPage } from './layout/ErrorPage';
+import { Chat } from './chats/Chat';
 
-const currentChat: ChatProps = {
-  id: '1',
-  sender: {
-    name: 'John Doe',
-    username: '@johndoe',
-    avatar: 'https://i.pravatar.cc/100?img=1',
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root></Root>,
+    errorElement: <ErrorPage></ErrorPage>,
+    children: [
+      {
+        path: "/chats/:chatId",
+        element: <Chat></Chat>,
+      }
+    ],
   },
-  messages: [],
-};
+]);
 
 function App() {
 
   return (
-    <Grid container spacing={0} sx={{ flexGrow: 1 }}>
-      <Grid xs={5} sm={4} md={3} lg={2}>
-        <Sidebar />
-      </Grid>
-      <Grid xs={7} sm={8} md={9} lg={10}>
-        <MessagesPane chat={currentChat} />
-      </Grid>
-    </Grid>
+    <RouterProvider router={router} />
   );
 
 }
